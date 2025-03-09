@@ -1,8 +1,7 @@
-
 from fastapi import APIRouter
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from ..ml import predecir_subsidio  # Importar la función de predicción
+from configuracion.ml import predecir_subsidio  # Importar la función de predicción
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter , HTTPException , status , Depends
-from ..esquemas import Token , UserCreate , LoginRequest
-from ..configuracion import supabase , get_password_hash , create_access_token , pwd_context , ALGORITHM , oauth2_scheme , SECRET_KEY
+from esquemas import Token , UserCreate , LoginRequest
+from configuracion import supabase , get_password_hash , create_access_token , pwd_context , ALGORITHM , oauth2_scheme , SECRET_KEY
 from jose import JWTError, jwt  # Manejo de JWT para la autenticación
 
 

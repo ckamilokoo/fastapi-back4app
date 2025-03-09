@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from ..chatbot.chatbot import graph
+from chatbot.chatbot import graph
 
 router = APIRouter()
 
