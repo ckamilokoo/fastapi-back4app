@@ -57,8 +57,8 @@ prompt = PromptTemplate.from_template(template)
 llm_chain = prompt | watsonx_llm | StrOutputParser()
 
 def chatbot(state: State):
-    ai_message = llm_chain.invoke({"mensaje":state["mensaje"]})
-    return {"mensaje": [ai_message]}
+    ai_message = llm_chain.invoke({"mensaje":state["messages"]})
+    return {"messages": [ai_message]}
 
 graph_builder.add_node("chatbot", chatbot)
 graph_builder.set_entry_point("chatbot")
