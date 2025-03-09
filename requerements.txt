@@ -4,3 +4,9 @@ pydantic[email]
 scikit-learn
 joblib
 pandas
+langchain_core 
+langgraph 
+langchain-ibm
+langchain
+python-dotenv 
+pydantic-settings

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-
+from chatbot import graph
 from ml import predecir_subsidio  # Importar la función de predicción
 
 app = FastAPI()
@@ -62,4 +62,34 @@ def recibir_datos(datos: DatosFormulario):
     resultado = predecir_subsidio(datos_prediccion)
 
     return {"message": "Datos recibidos", "prediccion": resultado}
+
+
+# Añade esto junto a tus otros modelos
+class MensajeRequest(BaseModel):
+    mensaje: str
+    thread_id: str
+
+# Modifica tu endpoint de mensajes así:
+@app.post("/mensajes")
+def procesar_mensaje(solicitud: MensajeRequest):
+    try:
+        config = {"configurable": {"thread_id": solicitud.thread_id}}
+        
+        result = graph.invoke(
+            {"messages": [{"role": "user", "content": solicitud.mensaje}]},
+            config
+        )
+        
+        if result and "messages" in result and result["messages"]:
+            last_message = result["messages"][-1]
+            return {
+                "respuesta": last_message.content,
+                "thread_id": solicitud.thread_id
+            }
+            
+        return {"error": "No se generó respuesta"}
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return {"error": str(e)}
 

@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 import joblib
 
 
-ruta = 'backend/app/datos_ml/int_quesubsidio.csv'
+ruta = '/datos_ml/int_quesubsidio.csv'
 # Supongamos que este es tu DataFrame original con muchas columnas
 df = pd.read_csv(ruta)
 
