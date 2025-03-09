@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     watsonx_project_id: str
     watsonx_url: str
     watsonx_model_id: str = "meta-llama/llama-3-3-70b-instruct"  # Valor por defecto
+    SUPABASE_URL:str
+    SUPABASE_KEY:str
 
     class Config:
         env_file = ".env"

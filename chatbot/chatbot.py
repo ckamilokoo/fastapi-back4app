@@ -3,7 +3,7 @@ from langgraph.graph import StateGraph, START, END
 from langchain_ibm import WatsonxLLM
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from config import settings
+from ..config import settings
 
 
 class State(MessagesState):
