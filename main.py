@@ -13,13 +13,14 @@ app.add_middleware(
 )
 
 # Importar e incluir los routers
-from rutas import datos, chatbot, stream ,acceso
+from rutas import datos, chatbot, stream ,acceso , Generar_prompt
 
 print(chatbot)
 app.include_router(datos.router)
 app.include_router(chatbot.router)
 app.include_router(stream.router)
 app.include_router(acceso.router)
+app.include_router(Generar_prompt.router)
 
 @app.get("/")
 def read_root():
