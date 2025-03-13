@@ -6,7 +6,7 @@ from typing import List, Optional
 
 # Definimos el modelo de la conversación
 class Conversacion(BaseModel):
-    user_id: int
+    username: str
     prompt: str
     messages: Optional[List[dict]] = []
 
@@ -15,41 +15,63 @@ router = APIRouter()
 @router.post("/conversaciones/")
 async def crear_conversacion(conversacion: Conversacion):
     try:
-        # Insertar la nueva conversación en la tabla 'conversations'
-        data = {
-            "user_id": conversacion.user_id,
-            "prompt": conversacion.prompt,
-            "messages": conversacion.messages
-        }
-        
-        # Intentar insertar los datos en la tabla de Supabase
-        response = supabase.table('conversations').insert(data).execute()
+        verificar_usuario = supabase.table('users').select('*').eq('username', conversacion.username).execute()
+        #print(verificar_usuario.data[0]['id'])
+        if verificar_usuario.data:
+            # Insertar la nueva conversación en la tabla 'conversations'
+            data = {
+                "user_id": verificar_usuario.data[0]['id'],
+                "prompt": conversacion.prompt,
+                "messages": conversacion.messages
+            }
+            
+            # Intentar insertar los datos en la tabla de Supabase
+            response = supabase.table('conversations').insert(data).execute()
 
+            
+            
+            # Si la inserción es exitosa, retornar la respuesta
+            return {"message": "Conversación creada exitosamente", "data": response.data}
         
-        
-        # Si la inserción es exitosa, retornar la respuesta
-        return {"message": "Conversación creada exitosamente", "data": response.data}
+        else:
+            return {"message": "Usuario no encontrado"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 # Función para verificar conversaciones
-@router.get("/conversaciones/{user_id}")
-async def verificar_conversaciones(user_id: int):
+@router.get("/conversaciones/{username}")
+async def verificar_conversaciones(username:str):
     try:
-        # Verificar existencia del usuario
-        user = supabase.table('users').select('*').eq('id', user_id).execute()
-        if not user.data:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        verificar_usuario = supabase.table('users').select('*').eq('username', username).execute()
+        #print(verificar_usuario.data[0]['id'])
+        if verificar_usuario.data:
+            # Verificar existencia del usuario
+            print("1")
+            user = supabase.table('users').select('*').eq('id', verificar_usuario.data[0]['id']).execute()
+            if not user.data:
+                print("2")
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
+            print("3")
+            # Verificar conversaciones
+            conversaciones = supabase.table('conversations').select('id' , 'prompt', 'messages', count='exact').eq('user_id', verificar_usuario.data[0]['id']).execute()
+            print(conversaciones.data)
+            #primero se crear una variable para guardar los id
+            prompts = []
+            #despues se recorre el valor de data dentro de conversaciones cada uno con un nombre item
+            for item in conversaciones.data:
+                #se utiliza la variable de los ids para agregar cada valor de id dentro de item.
+                prompts.append(item)
+                
+                    
 
-        # Verificar conversaciones
-        conversaciones = supabase.table('conversations').select('id', count='exact').eq('user_id', user_id).execute()
-
-        return {
-            "tiene_conversaciones": conversaciones.count > 0,
-            "total_conversaciones": conversaciones.count
-        }
+            print("IDs obtenidos:", prompts)
+            return {
+                "tiene_conversaciones": prompts,
+            }
+        else:
+            return {"message": "Usuario no encontrado"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
