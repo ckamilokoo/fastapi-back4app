@@ -9,6 +9,10 @@ class Conversacion(BaseModel):
     username: str
     prompt: str
     messages: Optional[List[dict]] = []
+    
+class eliminar_conversacion(BaseModel):
+    username: str
+    id_conversacion: str
 
 router = APIRouter()
 
@@ -32,6 +36,36 @@ async def crear_conversacion(conversacion: Conversacion):
             
             # Si la inserción es exitosa, retornar la respuesta
             return {"message": "Conversación creada exitosamente", "data": response.data}
+        
+        else:
+            return {"message": "Usuario no encontrado"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/conversaciones_eliminar/")
+async def crear_conversacion(informacion : eliminar_conversacion):
+    try:
+        #print(informacion.id_conversacion)
+        verificar_usuario = supabase.table('users').select('*').eq('username', informacion.username).execute()
+        #print(verificar_usuario.data[0]['id'])
+        if verificar_usuario.data:
+            # Insertar la nueva conversación en la tabla 'conversations'
+            
+            response = (supabase.table("conversations").delete().eq("id", informacion.id_conversacion).execute())
+
+            if response.data:
+            # Intentar insertar los datos en la tabla de Supabase
+            #response = supabase.table('conversations').insert(data).execute()
+
+            
+            
+            # Si la inserción es exitosa, retornar la respuesta
+                return {"message": "Conversación eliminada exitosamente"}
+            else:
+                return {"message": "ID incorrecto de conversacion"}
+            
+                
         
         else:
             return {"message": "Usuario no encontrado"}
