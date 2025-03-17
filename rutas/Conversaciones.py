@@ -3,6 +3,7 @@ from configuracion.token import supabase
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Optional
+from rutas.acceso import get_current_user
 
 # Definimos el modelo de la conversación
 class Conversacion(BaseModel):
@@ -17,7 +18,8 @@ class eliminar_conversacion(BaseModel):
 router = APIRouter()
 
 @router.post("/conversaciones/")
-async def crear_conversacion(conversacion: Conversacion):
+async def crear_conversacion(conversacion: Conversacion,
+    user: dict = Depends(get_current_user)):
     try:
         verificar_usuario = supabase.table('users').select('*').eq('username', conversacion.username).execute()
         #print(verificar_usuario.data[0]['id'])
@@ -44,7 +46,8 @@ async def crear_conversacion(conversacion: Conversacion):
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.post("/conversaciones_eliminar/")
-async def crear_conversacion(informacion : eliminar_conversacion):
+async def crear_conversacion(informacion : eliminar_conversacion,
+    user: dict = Depends(get_current_user)):
     try:
         #print(informacion.id_conversacion)
         verificar_usuario = supabase.table('users').select('*').eq('username', informacion.username).execute()
@@ -76,7 +79,8 @@ async def crear_conversacion(informacion : eliminar_conversacion):
 
 # Función para verificar conversaciones
 @router.get("/conversaciones/{username}")
-async def verificar_conversaciones(username:str):
+async def verificar_conversaciones(username:str,
+    user: dict = Depends(get_current_user)):
     try:
         verificar_usuario = supabase.table('users').select('*').eq('username', username).execute()
         #print(verificar_usuario.data[0]['id'])

@@ -6,6 +6,29 @@ from jose import JWTError, jwt  # Manejo de JWT para la autenticación
 
 router = APIRouter()
 
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Token inválido o expirado",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if not username:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # Verificar si el usuario existe en Supabase
+    response = supabase.table("users").select("*").eq("username", username).execute()
+    if not response.data:
+        raise credentials_exception
+
+    return response.data[0] 
+
 @router.post("/register", response_model=Token)
 async def register_user(user: UserCreate):
     # Verificar si el usuario ya existe

@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter , Depends
 from pydantic import BaseModel
 from chatbot.chatbot import graph
+from rutas.acceso import get_current_user
 
 router = APIRouter()
 
@@ -10,7 +11,8 @@ class MensajeRequest(BaseModel):
     thread_id: str
 
 @router.post("/mensajes")
-def procesar_mensaje(solicitud: MensajeRequest):
+def procesar_mensaje(solicitud: MensajeRequest,
+    user: dict = Depends(get_current_user)):
     try:
         config = {"configurable": {"thread_id": solicitud.thread_id}}
         # Supongo que "graph" se importa desde algún módulo; asegúrate de importarlo
